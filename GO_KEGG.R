@@ -5,7 +5,7 @@ library(ggplot2)
 library(GOplot)
 
 
-# 读取CSV文件，去除 'p-' 'm-' 前缀
+# 读取CSV文件
 marker <- read.csv("./kc_celltype_findmarkers.csv",row.names = 1)
 #colnames(marker)[1] <- "geneID" # 将第一列命名为'gene'
 
@@ -19,14 +19,14 @@ unique(marker$cluster)
 
 name = 'KC_Stress-Responsive' # 'KC-migratory'  'Activated KC_spinous' 'KC_basal_prolif' 'KC_Stress-Responsive'
 
-# 筛选上调表达的基因并选择前 100个基因
+# 筛选上调表达的基因
 top_up <- marker %>% filter(cluster == name) %>% filter(avg_log2FC > 0.5 & p_val < 0.05) %>% arrange(desc(avg_log2FC), p_val_adj) %>% 
   filter(!grepl("^ENSSS", gene) & !grepl("^ENSMFA", gene) & !grepl("^(RPL|RPS)", gene)) # %>% head(100)
 nrow(top_up)
 
-# 转换基因符号为ENTREZID
+# 转换基因符号为 ENTREZID
 gene_ID <- bitr(top_up$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Hs.eg.db)
-
+head(gene_ID)
 
 # ----------------------------------- GO ----------------------------------
 
@@ -87,7 +87,6 @@ if (nrow(GO) != 0) {
 
 # ----------------------------------- KEGG ----------------------------------
 
-
 # 设置p值和q值过滤阈值
 pvalueFilter = 0.2 # 0.05  
 qvalueFilter = 0.2 # 1
@@ -99,12 +98,12 @@ if (qvalueFilter > 0.05) {
 }
 
 
-# 筛选上调表达的基因并选择前 100个基因
+# 筛选上调表达的基因
 top_up <- marker %>% filter(cluster == name) %>% 
           filter(avg_log2FC > 0.3 & p_val_adj < 0.05) %>% arrange(desc(avg_log2FC), p_val_adj) 
 nrow(top_up)
 
-# 筛选下调表达的基因并选择前 100 个基因
+# 筛选下调表达的基因
 top_down <- marker %>% filter(cluster == name) %>% 
           filter(avg_log2FC < 0.3 & p_val_adj < 0.05) %>% arrange(avg_log2FC, p_val_adj) #%>% head(100)
 
@@ -173,11 +172,5 @@ if (nrow(KEGG_down) != 0 ) {
 # df$geneID = as.character(sapply(df$geneID, function(x) paste(gene_ID$SYMBOL[match(strsplit(x, "/")[[1]], as.character(gene_ID$ENTREZID))], collapse = "/"))) # 将geneID转换为基因符号
 # df_ed = df[(df$pvalue < pvalueFilter & df$qvalue < qvalueFilter),] 
 # write.csv(df_ed, file = "YWHAG_KEGG_down.csv", row.names = FALSE)
-
-
-
-
-
-
 
 
