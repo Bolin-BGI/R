@@ -59,7 +59,6 @@ if (nrow(GO) != 0) {
   print(p1)
   #dev.off()
   
-  
   # 生成条形图
   #pdf(file = "GO_bar.pdf", width = 10, height = 8)
   p2 <- barplot(GO, x = "Count", color = colorSel, showCategory = showNum, label_format=150,split="ONTOLOGY") + 
