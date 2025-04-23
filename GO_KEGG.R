@@ -74,7 +74,6 @@ if (nrow(GO) != 0) {
 
 # ----------------------------------- KEGG ----------------------------------
 
-
 # 设置p值和q值过滤阈值
 pvalueFilter = 0.2 # 0.05  
 qvalueFilter = 0.2 # 1
@@ -87,7 +86,7 @@ if (qvalueFilter > 0.05) {
 
 
 # 筛选上调表达的基因并选择前 100个基因
-top_up <- marker %>% filter(avg_log2FC > 0 & p_val_adj < 0.05) %>% arrange(desc(avg_log2FC), p_val_adj) 
+top_up <- marker %>% filter(avg_log2FC > 0.3 & p_val_adj < 0.05) %>% arrange(desc(avg_log2FC), p_val_adj) 
 # 筛选下调表达的基因并选择前 100 个基因
 top_down <- marker %>% filter(avg_log2FC < 0.3 & p_val_adj < 0.05) %>% arrange(avg_log2FC, p_val_adj) #%>% head(100)
 
