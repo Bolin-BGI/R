@@ -13,6 +13,8 @@
 ##############################################################################
 
 
+                       
+
 #' @title 绘制细胞群比例随分组变量变化趋势（改进调色板版）
 #' @description 可视化指定聚类列在不同分组条件下的比例变化趋势，支持多种调色板
 #' @param seurat_obj Seurat 对象
@@ -26,6 +28,8 @@ cluster_proportion_trend <- function(seurat_obj,
                                     group_col, 
                                     palette_name = "D3",
                                     prefix = "",
+                                    width = 15,  # 图片宽度（单位：英寸）
+                                    height = 10,  # 图片高度（单位：英寸）
                                     show_plot = TRUE) {
   # 加载必要包
   require(Seurat)
@@ -69,19 +73,17 @@ cluster_proportion_trend <- function(seurat_obj,
           legend.background = element_blank())
   
   # 分面折线图
-  p_facet <- ggplot(prop_data, aes(x = .data[[group_col]], 
-y = proportion,
-group = 1,
- color = .data[[cluster_col]])) +
-                geom_line(linewidth = 1) +
-                geom_point(size = 3) +
-                facet_wrap(as.formula(paste("~", cluster_col)), ncol = 4) +
-                scale_color_manual(values = color_palette) +
-                labs(title = "Cluster Proportion by Group",
-                     x = group_col,
-                     y = "Proportion (%)") +
-                common_theme +
-                theme(legend.position = "none")
+  p_facet <- ggplot(prop_data, aes(x = .data[[group_col]], y = proportion, group = 1,
+             color = .data[[cluster_col]])) +
+                              geom_line(linewidth = 1) +
+                              geom_point(size = 3) +
+                              facet_wrap(as.formula(paste("~", cluster_col)), ncol = 4) +
+                              scale_color_manual(values = color_palette) +
+                              labs(title = "Cluster Proportion by Group",
+                                  x = group_col,
+                                  y = "Proportion (%)") +
+                              common_theme +
+                              theme(legend.position = "none")
   
   # 组合折线图
   p_combined <- ggplot(prop_data, aes(x = .data[[group_col]], 
@@ -100,10 +102,8 @@ group = 1,
   
   # 保存图片
   if (prefix != "") {
-    ggsave(paste0(prefix, "_facet_proportion.png"), 
-           p_facet, width = 15, height = 10, dpi = 300)
-    ggsave(paste0(prefix, "_combined_proportion.png"), 
-           p_combined, width = 12, height = 8, dpi = 300)
+    ggsave(paste0(prefix, "_facet_proportion.png"), p_facet, width = width, height = height, dpi = 300)
+    ggsave(paste0(prefix, "_combined_proportion.png"), p_combined, width = 12, height = 8, dpi = 300)
   }
   
   # 显示图形
