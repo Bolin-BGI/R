@@ -88,8 +88,8 @@ if (nrow(GO) != 0) {
 # ----------------------------------- KEGG ----------------------------------
 
 # 设置p值和q值过滤阈值
-pvalueFilter = 0.2 # 0.05  
-qvalueFilter = 0.2 # 1
+pvalueFilter = 0.05 # 0.05  
+qvalueFilter = 0.05 # 1
 
 # 根据q值过滤阈值选择颜色
 colorSel = "qvalue"
@@ -161,16 +161,94 @@ if (nrow(KEGG_down) != 0 ) {
 }
 
 
-
 # df = as.data.frame(KEGG_up)
 # df$geneID = as.character(sapply(df$geneID, function(x) paste(gene_ID$SYMBOL[match(strsplit(x, "/")[[1]], as.character(gene_ID$ENTREZID))], collapse = "/"))) # 将geneID转换为基因符号
 # df_ed = df[(df$pvalue < pvalueFilter & df$qvalue < qvalueFilter),] 
-# write.csv(df_ed, file = "YWHAG_KEGG_up.csv", row.names = FALSE)
+# write.csv(df_ed, file = paste0(name,"_KEGG_down.csv"), row.names = FALSE)
 # 
 # 
 # df = as.data.frame(KEGG_down)
 # df$geneID = as.character(sapply(df$geneID, function(x) paste(gene_ID$SYMBOL[match(strsplit(x, "/")[[1]], as.character(gene_ID$ENTREZID))], collapse = "/"))) # 将geneID转换为基因符号
 # df_ed = df[(df$pvalue < pvalueFilter & df$qvalue < qvalueFilter),] 
-# write.csv(df_ed, file = "YWHAG_KEGG_down.csv", row.names = FALSE)
+# write.csv(df_ed, file = paste0(name,"_KEGG_down.csv"), row.names = FALSE)
+
+
+# ----------------------------------- GSEA ----------------------------------
+
+library(clusterProfiler)
+library(org.Hs.eg.db)
+library(enrichplot)
+library(ggplot2)
+library(GOplot)
+library(Seurat)
+library(dplyr)
+
+marker_gsea <- read.csv("./LUSC-Basal-Cell_markers.csv")
+colnames(marker_gsea)[1] <- "SYMBOL" # 将第一列命名为'gene'
+
+# 转换基因符号为ENTREZID并排序
+genelist <- marker_gsea %>% 
+  select(SYMBOL, avg_log2FC) %>%
+  merge(bitr(.$SYMBOL, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Hs.eg.db), by = "SYMBOL") %>%
+  arrange(desc(avg_log2FC)) %>%
+  {setNames(.$avg_log2FC, .$ENTREZID)}
+head(genelist)
+
+
+# GO富集分析
+gsego <- gseGO(geneList     = genelist,#根据LogFC排序后的基因列表
+               OrgDb        = org.Hs.eg.db,
+               ont          = "ALL",# GO分析的模块
+               minGSSize    = 10, #最小基因集的基因数
+               maxGSSize    = 500,#最大基因集的基因数
+               pvalueCutoff = 0.05,#p值的阈值
+               verbose      = FALSE)#是否输出提示信息
+
+df_go <- as.data.frame(gsego)
+df_go_filtered <- df_go[df_go$pvalue < pvalueFilter & df_go$qvalue < qvalueFilter, ]
+write.csv(df_go_filtered, file = paste0(name, "_gseGO.csv"), row.names = FALSE)
+
+p1 <- gseaplot2(gsego, geneSetID = 1:3)
+p1
+ggsave("gseGO.png", p1, bg = "white", dpi = 300, width = 8, height = 7)
+
+
+# KEGG富集分析
+gseKEGG <- gseKEGG(geneList     = genelist,#根据LogFC排序后的基因列表
+                   organism = "hsa",
+                   pvalueCutoff = 0.05,# p值的阈值
+                   verbose      = FALSE)#是否输出提示信息
+
+df_kegg <- as.data.frame(gseKEGG)
+df_kegg_filtered <- df_kegg[df_kegg$pvalue < pvalueFilter & df_kegg$qvalue < qvalueFilter, ]
+write.csv(df_kegg_filtered, file = paste0(name, "_gseKEGG.csv"), row.names = FALSE)
+
+plot_gseKEGG <- gseaplot2(gseKEGG, geneSetID = c("hsa04657","hsa05323"))
+plot_gseKEGG
+ggsave("gseKEGG.png", plot_gseKEGG, bg = "white", dpi = 300, width = 8, height = 7)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
