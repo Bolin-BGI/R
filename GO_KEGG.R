@@ -7,7 +7,7 @@ library(GOplot)
 
 # 读取CSV文件
 marker <- read.csv("./kc_celltype_findmarkers.csv",row.names = 1)
-#colnames(marker)[1] <- "geneID" # 将第一列命名为'gene'
+colnames(marker)[1] <- "geneID" # 将第一列命名为'gene'
 
 unique(marker$cluster)
 # [1] "KC-migratory"         "Activated KC_spinous"
@@ -32,12 +32,18 @@ head(gene_ID)
 
 # 设置p值和q值过滤阈值
 pvalueFilter = 0.05  
-qvalueFilter = 1
+qvalueFilter = 0.05
 
 # 根据q值过滤阈值选择颜色
 colorSel = "qvalue"
 if (qvalueFilter > 0.05) {
   colorSel = "pvalue"
+}
+
+# 设置显示的条目数
+showNum = 10
+if (nrow(GO) < 10) {
+  showNum = nrow(GO)
 }
 
 # main
@@ -52,12 +58,6 @@ print(paste0('The number of GO_items is : ',nrow(GO)))
 # df = as.data.frame(GO)
 # df_ed = df[(df$pvalue < pvalueFilter & df$qvalue < qvalueFilter),] 
 # write.csv(df_ed, file = "YWHAG_positive_GO_up.csv", row.names = FALSE)
-
-# 设置显示的条目数
-showNum = 10
-if (nrow(GO) < 10) {
-  showNum = nrow(GO)
-}
 
 # 如果有富集结果，生成气泡图
 if (nrow(GO) != 0) {
@@ -86,17 +86,6 @@ if (nrow(GO) != 0) {
 
 
 # ----------------------------------- KEGG ----------------------------------
-
-# 设置p值和q值过滤阈值
-pvalueFilter = 0.05 # 0.05  
-qvalueFilter = 0.05 # 1
-
-# 根据q值过滤阈值选择颜色
-colorSel = "qvalue"
-if (qvalueFilter > 0.05) {
-  colorSel = "pvalue"
-}
-
 
 # 筛选上调表达的基因
 top_up <- marker %>% filter(cluster == name) %>% 
@@ -171,6 +160,107 @@ if (nrow(KEGG_down) != 0 ) {
 # df$geneID = as.character(sapply(df$geneID, function(x) paste(gene_ID$SYMBOL[match(strsplit(x, "/")[[1]], as.character(gene_ID$ENTREZID))], collapse = "/"))) # 将geneID转换为基因符号
 # df_ed = df[(df$pvalue < pvalueFilter & df$qvalue < qvalueFilter),] 
 # write.csv(df_ed, file = paste0(name,"_KEGG_down.csv"), row.names = FALSE)
+
+
+###################### ------------------- 循环 ------------------- ######################
+# # 开始循环处理每个细胞类型
+# for (name in cell_types) {
+  
+#   # 打印当前处理状态
+#   cat(paste0("Processing: ", name, "\n"))
+  
+#   # ------------------------ 基因筛选部分 ------------------------
+#   tryCatch({
+#     # 筛选上调表达的基因
+#     top_up <- marker %>% 
+#       filter(cluster == name) %>% 
+#       filter(avg_log2FC > 2 & p_val < 0.05) %>% 
+#       arrange(desc(scores), p_val_adj) %>% 
+#       filter(!grepl("^ENSSS", gene) & 
+#                !grepl("^ENSMFA", gene) & 
+#                !grepl("^(RPL|RPS)", gene))
+    
+#     # 转换基因符号为 ENTREZID
+#     gene_ID <- bitr(top_up$gene, fromType = "SYMBOL", toType = "ENTREZID",  OrgDb = org.Hs.eg.db)
+    
+#     # 如果没有有效基因则跳过
+#     if(nrow(gene_ID) == 0) {
+#       cat(paste0("No valid genes for ", name, "\n"))
+#       next
+#     }
+    
+#     # ------------------------ GO 富集分析 ------------------------
+#     GO <- enrichGO(gene = gene_ID$ENTREZID,
+#                    OrgDb = org.Hs.eg.db,
+#                    keyType = "ENTREZID",
+#                    ont = "ALL",
+#                    pvalueCutoff = 0.5,
+#                    qvalueCutoff = 0.5,
+#                    readable = TRUE)
+    
+#     # 输出GO结果
+#     # write.csv(as.data.frame(GO), file = paste0(name, "_GO_results.csv"))
+    
+#     # 绘制图形（如果有结果）
+#     if(nrow(GO) > 0) {
+#       current_showNum <- min(showNum, nrow(GO))
+      
+#       pdf(file = paste0(name, "_GO_dotplot.pdf"), width = 12, height = 15)
+#       dotplot(GO, x = "GeneRatio", color = colorSel, size = "Count", 
+#               showCategory = current_showNum, label_format=150, split="ONTOLOGY") + 
+#         facet_grid(ONTOLOGY~., scales = 'free')
+#       dev.off()
+      
+#       pdf(file = paste0(name, "_GO_barplot.pdf"), width = 12, height = 8)
+#       barplot(GO, x = "Count", color = colorSel, 
+#               showCategory = current_showNum, label_format=150, split="ONTOLOGY") + 
+#         facet_grid(ONTOLOGY~., scales = 'free')
+#       dev.off()
+      
+#       # 树状图
+#       GO_ed <- pairwise_termsim(GO)
+#       pdf(file = paste0(name, "_GO_treeplot.pdf"))
+#       treeplot(GO_ed)
+#       dev.off()
+#     }
+    
+#     # ------------------------ KEGG 富集分析 ------------------------
+#     KEGG_up <- enrichKEGG(gene = gene_ID$ENTREZID, 
+#                           organism = "hsa", 
+#                           pvalueCutoff = pvalueFilter, 
+#                           qvalueCutoff = qvalueFilter)
+    
+#     # 输出KEGG结果
+#     # write.csv(as.data.frame(KEGG_up), file = paste0(name, "_KEGG_results.csv"))
+    
+#     # 绘制图形（如果有结果）
+#     if(nrow(KEGG_up) > 0) {
+#       current_showNum <- min(showNum, nrow(KEGG_up))
+      
+#       pdf(file = paste0(name, "_KEGG_barplot.pdf"), width = 12, height = 10)
+#       barplot(KEGG_up, x = "Count", color = colorSel, 
+#               showCategory = current_showNum, font.size = 15, 
+#               title = "KEGG enrichment barplot", label_format = 50)
+#       dev.off()
+      
+#       pdf(file = paste0(name, "_KEGG_dotplot.pdf"), width = 12, height = 10)
+#       dotplot(KEGG_up, x = "GeneRatio", color = colorSel, 
+#               showCategory = current_showNum, 
+#               title = paste0("Top ", current_showNum ," of Pathway Enrichment"),  
+#               label_format = 70)
+#       dev.off()
+      
+#       # 树状图
+#       KEGG_up_ed <- pairwise_termsim(KEGG_up)
+#       pdf(file = paste0(name, "_KEGG_treeplot.pdf"))
+#       treeplot(KEGG_up_ed)
+#       dev.off()
+#     }
+    
+#   }, error = function(e) {
+#     cat(paste0("Error processing ", name, ": ", e$message, "\n"))
+#   })
+# }
 
 
 # ----------------------------------- GSEA ----------------------------------
