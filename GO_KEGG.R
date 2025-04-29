@@ -164,6 +164,7 @@ if (nrow(KEGG_down) != 0 ) {
 
 ###################### ------------------- 循环 ------------------- ######################
 # # 开始循环处理每个细胞类型
+# 开始循环处理每个细胞类型
 # for (name in cell_types) {
   
 #   # 打印当前处理状态
@@ -181,7 +182,10 @@ if (nrow(KEGG_down) != 0 ) {
 #                !grepl("^(RPL|RPS)", gene))
     
 #     # 转换基因符号为 ENTREZID
-#     gene_ID <- bitr(top_up$gene, fromType = "SYMBOL", toType = "ENTREZID",  OrgDb = org.Hs.eg.db)
+#     gene_ID <- bitr(top_up$gene, 
+#                     fromType = "SYMBOL", 
+#                     toType = "ENTREZID", 
+#                     OrgDb = org.Hs.eg.db)
     
 #     # 如果没有有效基因则跳过
 #     if(nrow(gene_ID) == 0) {
@@ -202,25 +206,27 @@ if (nrow(KEGG_down) != 0 ) {
 #     # write.csv(as.data.frame(GO), file = paste0(name, "_GO_results.csv"))
     
 #     # 绘制图形（如果有结果）
-#     if(nrow(GO) > 0) {
-#       current_showNum <- min(showNum, nrow(GO))
+#     if (nrow(GO) != 0) {
+#       # 生成GO图
+#       pdf(file = paste0(name, "_GO.pdf"), width = 12, height = 15)
       
-#       pdf(file = paste0(name, "_GO_dotplot.pdf"), width = 12, height = 15)
-#       dotplot(GO, x = "GeneRatio", color = colorSel, size = "Count", 
-#               showCategory = current_showNum, label_format=150, split="ONTOLOGY") + 
+#       # 调整显示条目数
+#       current_showNum <- ifelse(nrow(GO) < 10, nrow(GO), showNum)
+      
+#       p1 <- dotplot(GO, x = "GeneRatio", color = colorSel, size = "Count", 
+#                     showCategory = current_showNum, label_format=150, split="ONTOLOGY") +
 #         facet_grid(ONTOLOGY~., scales = 'free')
-#       dev.off()
+#       print(p1)
       
-#       pdf(file = paste0(name, "_GO_barplot.pdf"), width = 12, height = 8)
-#       barplot(GO, x = "Count", color = colorSel, 
-#               showCategory = current_showNum, label_format=150, split="ONTOLOGY") + 
+#       p2 <- barplot(GO, x = "Count", color = colorSel, 
+#                     showCategory = current_showNum, label_format=150, split="ONTOLOGY") + 
 #         facet_grid(ONTOLOGY~., scales = 'free')
-#       dev.off()
+#       print(p2)
       
-#       # 树状图
 #       GO_ed <- pairwise_termsim(GO)
-#       pdf(file = paste0(name, "_GO_treeplot.pdf"))
-#       treeplot(GO_ed)
+#       p3 <- treeplot(GO_ed)
+#       print(p3)
+      
 #       dev.off()
 #     }
     
@@ -234,26 +240,28 @@ if (nrow(KEGG_down) != 0 ) {
 #     # write.csv(as.data.frame(KEGG_up), file = paste0(name, "_KEGG_results.csv"))
     
 #     # 绘制图形（如果有结果）
-#     if(nrow(KEGG_up) > 0) {
-#       current_showNum <- min(showNum, nrow(KEGG_up))
+#     if (nrow(KEGG_up) != 0) {
+#       # 生成KEGG图
+#       pdf(file = paste0(name, "_KEGG_up.pdf"), width = 12, height = 10)
       
-#       pdf(file = paste0(name, "_KEGG_barplot.pdf"), width = 12, height = 10)
-#       barplot(KEGG_up, x = "Count", color = colorSel, 
-#               showCategory = current_showNum, font.size = 15, 
-#               title = "KEGG enrichment barplot", label_format = 50)
-#       dev.off()
+#       # 调整显示条目数
+#       current_showNum <- ifelse(nrow(KEGG_up) < 10, nrow(KEGG_up), showNum)
       
-#       pdf(file = paste0(name, "_KEGG_dotplot.pdf"), width = 12, height = 10)
-#       dotplot(KEGG_up, x = "GeneRatio", color = colorSel, 
-#               showCategory = current_showNum, 
-#               title = paste0("Top ", current_showNum ," of Pathway Enrichment"),  
-#               label_format = 70)
-#       dev.off()
+#       p1 <- barplot(KEGG_up, x = "Count", color = colorSel, 
+#                     showCategory = current_showNum, font.size = 15, 
+#                     title = "KEGG enrichment barplot", label_format = 50)
+#       print(p1)
       
-#       # 树状图
+#       p2 <- dotplot(KEGG_up, x = "GeneRatio", color = colorSel, 
+#                     showCategory = current_showNum, 
+#                     title = paste0("Top ", current_showNum ," of Pathway Enrichment"),  
+#                     label_format = 70)
+#       print(p2)
+      
 #       KEGG_up_ed <- pairwise_termsim(KEGG_up)
-#       pdf(file = paste0(name, "_KEGG_treeplot.pdf"))
-#       treeplot(KEGG_up_ed)
+#       p3 <- treeplot(KEGG_up_ed)
+#       print(p3)
+      
 #       dev.off()
 #     }
     
