@@ -17,6 +17,17 @@ Sankey 图，展示流向和分布。
 ## 📊 Sankey_bar_split
 
 Sankey—split 图，展示分组流向和分布。
+
+Sankey_bar_split(obj,
+         x_var = "maincelltype_0924",
+         y_var = "day",
+         group_var = "monkey",
+         group_filter = c("M1","M2","M3","M4","M5"),
+         output_prefix = "monkey_split",
+         combine_plot = TRUE,
+         show_labels = TRUE,
+         label_threshold = 3)
+         
 <p align="center">
   <img width="4200" height="2400" alt="stage_composition_combined" src="https://github.com/user-attachments/assets/4ab6aa5a-59f2-4755-82b8-e160489d270f" />
 </p>
