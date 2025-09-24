@@ -18,6 +18,7 @@ Sankey 图，展示流向和分布。
 
 Sankey—split 图，展示分组流向和分布。
 
+```r
 Sankey_bar_split(obj,
          x_var = "maincelltype_0924",
          y_var = "day",
@@ -27,9 +28,12 @@ Sankey_bar_split(obj,
          combine_plot = TRUE,
          show_labels = TRUE,
          label_threshold = 3)
+```
+
          
 <p align="center">
-  <img width="4200" height="2400" alt="stage_composition_combined" src="https://github.com/user-attachments/assets/4ab6aa5a-59f2-4755-82b8-e160489d270f" />
+  <img width="668" height="841" alt="image" src="https://github.com/user-attachments/assets/42eb23e8-9bd4-489f-ab0c-1d06355eaef5" />
+
 </p>
 
 
