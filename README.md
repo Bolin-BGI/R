@@ -40,9 +40,21 @@ Sankey_bar_split(obj,
 ## 🌋 plot_volcano
 
 火山图，常用于差异分析结果可视化。
-
+```r
+plot_volcano(
+  data,
+  output_file = "LUSC_tumor_volcano2.pdf",
+  logFC_cutoff = 0.5,
+  pval_cutoff = 0.05,
+  highlight_genes = 'CLEC2B',
+  label_top = 5,
+  xlim = NULL,
+  ylim = c(0, 350),
+  gene_col = "X",  # 新增参数: 指定基因列
+  width = 6, height = 6
+)
+```
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/69fcccbc-92a4-4a83-b9a6-5b62e123bc14" width="300" />
   <img src="https://github.com/user-attachments/assets/d18e3baf-518c-4580-b606-9297cb73c472" width="500" />
 </p>
 
