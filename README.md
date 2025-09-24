@@ -14,6 +14,14 @@ Sankey 图，展示流向和分布。
 
 ---
 
+## 📊 Sankey_bar_split
+
+Sankey—split 图，展示分组流向和分布。
+<p align="center">
+  <img width="4200" height="2400" alt="stage_composition_combined" src="https://github.com/user-attachments/assets/4ab6aa5a-59f2-4755-82b8-e160489d270f" />
+</p>
+
+
 ## 🌋 plot_volcano
 
 火山图，常用于差异分析结果可视化。
