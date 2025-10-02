@@ -28,7 +28,7 @@
 stacked_barplot <- function(obj, 
                             group_x, 
                             group_y, 
-                            file_name = 'stacked_barplot.png', 
+                            file_name = 'stacked_barplot', 
                             width = 12, 
                             height = 8, 
                             dpi = 300, 
@@ -119,15 +119,25 @@ stacked_barplot <- function(obj,
       fontface = "bold"
     )
   
-  # 保存图片
-  ggsave(
-    filename = file_name,
-    plot = p,
-    width = width,
-    height = height,
-    dpi = dpi,
-    bg = "white"
-  )
+    # 保存 PNG
+    ggsave(
+      filename = paste0(file_name, "_stacked_barplot.png"),
+      plot = p,
+      width = width,
+      height = height,
+      dpi = dpi,
+      bg = "white"
+    )
+
+    # 保存 PDF
+    ggsave(
+      filename = paste0(file_name, "_stacked_barplot.pdf"),
+      plot = p,
+      width = width,
+      height = height,
+      dpi = dpi,
+      bg = "white"
+    )
   
   return(p)
 }
