@@ -77,3 +77,27 @@ plot_volcano(
 <p align="center">
   <img src="https://github.com/user-attachments/assets/982f0957-1ac8-496f-81bd-d19228c22485" width="400" />
 </p>
+
+---
+
+## 📈 cluster_day_percent_by_monkey
+
+统计每个猴子（monkey）在各时间点（day）中不同细胞群（group）的比例并绘图
+
+```r
+p <- cluster_day_percent_by_monkey_R(
+  obj,
+  group_col = "kc_1020",
+  day_col = "day",
+  monkey_col = "monkey",
+  day_levels = c("1","3","7","14","21"),
+  prefix = "kc1020_allMonkeys"
+)
+```
+
+<p align="center">
+  <img width="1648" height="985" alt="image" src="https://github.com/user-attachments/assets/a5f524ec-b55e-4c99-8305-d56e9ad7fe0f" />
+</p>
+
+
+
