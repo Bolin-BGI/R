@@ -7,6 +7,17 @@
 ## 📊 Sankey_bar
 
 Sankey 图，展示流向和分布。
+```r
+options(repr.plot.width=8, repr.plot.height=6)
+
+# 绘制stage在细胞亚型中的流动分布
+Sankey_bar(obj, 
+             x_var = "sample",
+             y_var = "stage",
+             color_palette = cor_stage,
+             output_prefix = "percent_stage_sub", width = 8, height = 6)
+```
+
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/2fedd35a-d8c4-4f6f-a549-490fe17bc7eb" width="500" />
