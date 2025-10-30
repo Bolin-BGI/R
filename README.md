@@ -75,6 +75,19 @@ plot_volcano(
 
 堆叠柱状图，展示类别组成比例。
 
+```r
+options(repr.plot.width=10, repr.plot.height=12)
+
+stacked_barplot(
+  obj = obj,
+  group_x = "celltype_0818",
+  group_y = "Time_category",
+  file_name = "celltype_0818_Time_category",
+  custom_colors = time_Colors,
+  width = 10,
+  height = 12
+)
+```
 <p align="center">
   <img src="https://github.com/user-attachments/assets/40e327b5-3cc5-4a7c-b291-d8b1d7ce8d84" width="500" />
 </p>
