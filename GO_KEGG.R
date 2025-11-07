@@ -86,6 +86,93 @@ if (nrow(GO) != 0) {
 }
 
 
+# ----------------------------------- clusterProfiler ----------------------------------
+
+
+library(clusterProfiler)
+library(org.Hs.eg.db)
+library(enrichplot)
+library(ggplot2)
+library(GOplot)
+library(org.Rn.eg.db) # 大鼠，褐家鼠（Rat)
+
+gene_list_all <- readRDS('./mfuzz_monocyte_6_gene.rds')
+
+GO_draw_rat_gene_list <- function(gene_list_all){
+  #参考：https://blog.csdn.net/qq_42090739/article/details/127306616
+  #library(viridis)
+  library(ggplot2)
+  library(clusterProfiler)
+  library(AnnotationDbi)
+  library(org.Rn.eg.db)
+  library(DOSE)
+  library(cowplot)
+  library(stringr)
+  library(forcats)
+  #org.Rn.eg.db <-loadDb("/hwfssz5/ST_SUPERCELLS/P21Z10200N0171/PROJECT/Skin_standby/01.ATAC_rn7/00.data/annotation/orgDB_Rattus.sqlite")
+  
+  # 提取基因和分组信息
+  gene_name = unlist(gene_list_all)
+  group_name = rep(names(gene_list_all), times = sapply(gene_list_all, length))
+  df <- data.frame(gene = gene_name, group = group_name)
+  
+  data_GO <- compareCluster(
+    gene~group, 
+    data=df, 
+    fun="enrichGO", 
+    OrgDb= org.Rn.eg.db,
+    ont = "BP",
+    pAdjustMethod = "BH",
+    pvalueCutoff = 0.05,
+    qvalueCutoff = 0.05,
+    keyType = "SYMBOL"
+  )
+  
+  # 富集分析结果简化:  表示仅保留相似性小于 0.7 的 GO 术语,根据 p.adjust p 值进行筛选
+  data_GO_sim <- clusterProfiler::simplify(data_GO, 
+                                           cutoff=0.7, 
+                                           by="p.adjust", 
+                                           select_fun=min)
+  
+  p = dotplot(data_GO_sim, showCategory=10, font.size = 8, label_format = 50)
+  
+  return(p)
+  # ggsave("mono_all_GO.png", plot = p, width = 8, height = 15, dpi = 300)
+  ggsave("mono_all_GO.pdf", plot = p, width = 8, height = 12)
+
+}
+
+
+gene_list_all <- readRDS('./mfuzz_monocyte_6_gene.rds')
+gene_name = unlist(gene_list_all)
+group_name = rep(names(gene_list_all), times = sapply(gene_list_all, length))
+df <- data.frame(gene = gene_name, group = group_name)
+
+data_GO <- compareCluster(
+                          gene~group, 
+                          data=df, 
+                          fun="enrichGO", 
+                          OrgDb= org.Rn.eg.db,
+                          ont = "BP",
+                          pAdjustMethod = "BH",
+                          pvalueCutoff = 0.05,
+                          qvalueCutoff = 0.05,
+                          keyType = "SYMBOL")
+
+# 富集分析结果简化:  表示仅保留相似性小于 0.7 的 GO 术语,根据 p.adjust p 值进行筛选
+data_GO_sim <- clusterProfiler::simplify(data_GO, 
+                                         cutoff=0.7, 
+                                         by="p.adjust", 
+                                         select_fun=min) # 多个相似术语中选择 p 值最小的术语
+
+p = dotplot(data_GO_sim, showCategory=10, font.size = 8, label_format = 50)
+# return(p)
+ggsave("mono_all_GO.pdf", plot = p, width = 8, height = 12)
+
+
+
+
+
 
 # ----------------------------------- KEGG ----------------------------------
 
