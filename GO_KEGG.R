@@ -167,7 +167,33 @@ data_GO_sim <- clusterProfiler::simplify(data_GO,
 
 p = dotplot(data_GO_sim, showCategory=10, font.size = 8, label_format = 50)
 # return(p)
-ggsave("mono_all_GO.pdf", plot = p, width = 8, height = 12)
+ggsave("all_GO_simplify.pdf", plot = p, width = 8, height = 12)
+
+
+# 提取和保存唯一的 GO 条目
+unique_terms <- unique(data_GO_sim@compareClusterResult$Description)
+write.csv(unique_terms, file = 'unique_term.csv', row.names = TRUE)
+
+# 读取保存的条目并筛选 GO 结果
+term <- read.csv('unique_term.csv', row.names = 1) 
+filtered_GO <- data_GO_sim@compareClusterResult[data_GO_sim@compareClusterResult$Description %in% term$GO, ]
+
+# 筛选出特定群集的 GO 条目
+filtered_GO <- filtered_GO[filtered_GO$Cluster %in% c("cluster_1", "cluster_2", "cluster_3"), ]
+data_GO_filtered <- data_GO_sim
+data_GO_filtered@compareClusterResult <- as.data.frame(filtered_GO)
+write.csv(data_GO_filtered@compareClusterResult, file = 'filtered_meta.csv', row.names = TRUE)
+
+# 读取并重新排序处理后的数据
+data_GO_filtered <- readRDS('data_GO_filtered.rds')
+data_GO_filtered@compareClusterResult$Cluster <- factor(data_GO_filtered@compareClusterResult$Cluster,
+                                                        levels = c("cluster_2", "cluster_1", "cluster_3"))
+
+# 最终的绘图和保存
+p <- dotplot(data_GO_filtered, showCategory = 10, font.size = 8, label_format = 50) + 
+    theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1))
+
+ggsave("selected_GO_filtered_END.pdf", plot = p, width = 5, height = 5.5)
 
 
 
