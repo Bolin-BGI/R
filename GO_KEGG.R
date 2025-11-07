@@ -42,9 +42,7 @@ if (qvalueFilter > 0.05) {
 
 # 设置显示的条目数
 showNum = 10
-if (nrow(GO) < 10) {
-  showNum = nrow(GO)
-}
+
 
 # main
 GO <- enrichGO(gene = gene_ID$ENTREZID,OrgDb = org.Hs.eg.db,
@@ -55,9 +53,13 @@ GO <- enrichGO(gene = gene_ID$ENTREZID,OrgDb = org.Hs.eg.db,
                readable = TRUE)
 print(paste0('The number of GO_items is : ',nrow(GO)))
 
-# df = as.data.frame(GO)
-# df_ed = df[(df$pvalue < pvalueFilter & df$qvalue < qvalueFilter),] 
-# write.csv(df_ed, file = "YWHAG_positive_GO_up.csv", row.names = FALSE)
+df = as.data.frame(GO)
+df_ed = df[(df$pvalue < pvalueFilter & df$qvalue < qvalueFilter),] 
+write.csv(df_ed, file = "positive_GO_up.csv", row.names = FALSE)
+
+if (nrow(GO) < 10) {
+  showNum = nrow(GO)
+}
 
 # 如果有富集结果，生成气泡图
 if (nrow(GO) != 0) {
