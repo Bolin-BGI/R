@@ -17,6 +17,9 @@
 # source("anndata2seurat.R")
 # seurat_obj <- anndata2seurat("input.h5ad", outFile = "output.rds", main_layer = "counts")
 
+library(Seurat)
+library(Matrix)
+library(reticulate)
 
 anndata2seurat <- function(inFile, outFile = NULL, main_layer = "counts", 
                            assay = "RNA", use_seurat = FALSE, lzf = FALSE, 
@@ -218,3 +221,4 @@ anndata2seurat <- function(inFile, outFile = NULL, main_layer = "counts",
   }
   return(df)
 }
+
