@@ -92,6 +92,76 @@ if (nrow(GO) != 0) {
 }
 
 
+
+
+
+# ----------------------------------- GO 结果筛选 ----------------------------------
+
+# 1. 定义你想要保留的 GO ID 列表
+# (你可以从你的 csv 文件中复制粘贴你感兴趣的 ID 到这里)
+selected_IDs <- c(
+  "GO:0042130", 
+  "GO:0050868", 
+  "GO:0032945"
+  # ... 继续添加你想要的 ID
+)
+
+# 或者，如果你是根据关键词筛选的（比如只看 "T cell" 相关的）
+# selected_rows <- grep("T cell", GO@result$Description)
+# selected_IDs <- GO@result$ID[selected_rows]
+
+# 2. 创建一个新的对象用于绘图（防止覆盖原始结果）
+GO_filtered <- GO
+
+# 3. 【核心步骤】将对象内部的数据替换为你筛选后的数据
+# 这里的 @result 是 S4 对象存储数据的槽位
+GO_filtered@result <- GO@result[GO@result$ID %in% selected_IDs, ]
+
+# 4. 重新设置 pvalue 和 qvalue 的阈值检查
+# 因为你已经手动筛选了，为了防止绘图函数内部再次过滤，我们可以把对象的阈值设宽
+GO_filtered@pvalueCutoff <- 1
+GO_filtered@qvalueCutoff <- 1
+
+# 5. 检查筛选后还剩多少个
+print(paste0("手动筛选后剩余条目数: ", nrow(GO_filtered@result)))
+
+# 6. 使用筛选后的对象重新绘图
+if (nrow(GO_filtered@result) > 0) {
+  
+  # 设置输出文件名
+  pdf(file = paste0(name, "_GO_Manual_Filtered.pdf"), width = 10, height = 8)
+  
+  # --- 气泡图 ---
+  # showCategory 可以设置得很大，以确保显示你选中的所有条目
+  p1 <- dotplot(GO_filtered, 
+                color = colorSel, 
+                showCategory = nrow(GO_filtered@result), 
+                title = "Manual Filtered GO Enrichment",
+                label_format = 60,
+                split = "ONTOLOGY") + 
+        facet_grid(ONTOLOGY~., scales = 'free')
+  print(p1)
+  
+  # --- 条形图 ---
+  p2 <- barplot(GO_filtered, 
+                color = colorSel, 
+                showCategory = nrow(GO_filtered@result), 
+                title = "Manual Filtered GO Enrichment",
+                label_format = 60,
+                split = "ONTOLOGY") + 
+        facet_grid(ONTOLOGY~., scales = 'free')
+  print(p2)
+  
+  dev.off()
+  print("筛选后的图片已生成。")
+} else {
+  print("错误：筛选后的 ID 在原始结果中找不到，请检查 ID 是否拼写正确。")
+}
+
+
+
+
+
 # ----------------------------------- clusterProfiler::simplify ----------------------------------
 
 
