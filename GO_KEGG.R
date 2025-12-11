@@ -117,10 +117,13 @@ GO_filtered <- GO
 # 这里的 @result 是 S4 对象存储数据的槽位
 GO_filtered@result <- GO@result[GO@result$ID %in% selected_IDs, ]
 
-# 4. 重新设置 pvalue 和 qvalue 的阈值检查
-# 因为你已经手动筛选了，为了防止绘图函数内部再次过滤，我们可以把对象的阈值设宽
-GO_filtered@pvalueCutoff <- 1
-GO_filtered@qvalueCutoff <- 1
+# 4. 【可选】手动筛选
+manual_df <- read.csv("FTDIW_vs_Normal_UP_GO_selected.csv") # 1. 读取你手动处理过的 CSV
+selected_IDs <- manual_df$ID # 2. 获取 CSV 里的 ID
+GO_filtered <- GO
+GO_filtered@result <- GO@result[GO@result$ID %in% selected_IDs, ]
+# 【可选】GO_filtered@result <- manual_df
+
 
 # 5. 检查筛选后还剩多少个
 print(paste0("手动筛选后剩余条目数: ", nrow(GO_filtered@result)))
@@ -357,18 +360,82 @@ if (nrow(KEGG_down) != 0 ) {
 }
 
 
-# df = as.data.frame(KEGG_up)
-# df$geneID = as.character(sapply(df$geneID, function(x) paste(gene_ID$SYMBOL[match(strsplit(x, "/")[[1]], as.character(gene_ID$ENTREZID))], collapse = "/"))) # 将geneID转换为基因符号
-# df_ed = df[(df$pvalue < pvalueFilter & df$qvalue < qvalueFilter),] 
-# write.csv(df_ed, file = paste0(name,"_KEGG_down.csv"), row.names = FALSE)
-# 
-# 
-# df = as.data.frame(KEGG_down)
-# df$geneID = as.character(sapply(df$geneID, function(x) paste(gene_ID$SYMBOL[match(strsplit(x, "/")[[1]], as.character(gene_ID$ENTREZID))], collapse = "/"))) # 将geneID转换为基因符号
-# df_ed = df[(df$pvalue < pvalueFilter & df$qvalue < qvalueFilter),] 
-# write.csv(df_ed, file = paste0(name,"_KEGG_down.csv"), row.names = FALSE)
+df = as.data.frame(KEGG_up)
+df$geneID = as.character(sapply(df$geneID, function(x) paste(gene_ID$SYMBOL[match(strsplit(x, "/")[[1]], as.character(gene_ID$ENTREZID))], collapse = "/"))) # 将geneID转换为基因符号
+df_ed = df[(df$pvalue < pvalueFilter & df$qvalue < qvalueFilter),] 
+write.csv(df_ed, file = paste0(name,"_KEGG_down.csv"), row.names = FALSE)
 
 
+df = as.data.frame(KEGG_down)
+df$geneID = as.character(sapply(df$geneID, function(x) paste(gene_ID$SYMBOL[match(strsplit(x, "/")[[1]], as.character(gene_ID$ENTREZID))], collapse = "/"))) # 将geneID转换为基因符号
+df_ed = df[(df$pvalue < pvalueFilter & df$qvalue < qvalueFilter),] 
+write.csv(df_ed, file = paste0(name,"_KEGG_down.csv"), row.names = FALSE)
+
+
+
+
+
+
+# ----------------------------------- KEGG 结果筛选 ----------------------------------
+
+# -------------------------------------------------------------------------
+# 手动筛选 KEGG 结果并重新绘图
+# -------------------------------------------------------------------------
+
+# 1. 读取你手动处理过的 CSV 文件 # 确保你的 CSV 里有一列叫 "ID" (例如 rno04060)
+
+manual_kegg_df <- read.csv("FTDIW_vs_Normal_UP_KEGG_selected.csv")
+selected_kegg_IDs <- manual_kegg_df$ID # 2. 获取筛选后的 Pathway ID 列表
+
+print(paste0("你手动保留了 ", length(selected_kegg_IDs), " 条 KEGG 通路。"))
+
+# 3. 【核心步骤】创建新对象并替换数据
+# 复制原始对象，防止破坏原数据
+KEGG_filtered <- KEGG_up 
+
+# 用筛选后的 ID 来过滤原始结果
+# 注意：这里我们过滤的是内存中原始 KEGG_up 对象里的数据，
+# 所以即使你的 CSV 里 geneID 转成了 Symbol，只要 ID (rno...) 对得上，
+# 绘图时依然会使用对象里原始的 EntrezID (这反而更好，不容易报错)
+KEGG_filtered@result <- KEGG_up@result[KEGG_up@result$ID %in% selected_kegg_IDs, ]
+# 【可选】KEGG_filtered@result <- manual_kegg_df
+
+                                
+# 5. 重新绘图
+if (nrow(KEGG_filtered@result) > 0) {
+  
+  pdf(file = paste0(name, "_KEGG_Manual_Filtered.pdf"), width = 12, height = 10)
+  
+  # --- 条形图 ---
+  p1 <- barplot(KEGG_filtered, 
+                color = colorSel, 
+                showCategory = nrow(KEGG_filtered@result), # 显示所有筛选出的条目
+                title = "Manual Filtered KEGG Enrichment", 
+                font.size = 15,
+                label_format = 60)
+  print(p1)
+  
+  # --- 气泡图 ---
+  p2 <- dotplot(KEGG_filtered, 
+                color = colorSel, 
+                showCategory = nrow(KEGG_filtered@result), 
+                title = "Manual Filtered KEGG Enrichment", 
+                label_format = 60)
+  print(p2)
+  
+  dev.off()
+  print("筛选后的 KEGG 图片已生成。")
+  
+} else {
+  print("错误：筛选后的 ID 在原始 KEGG 结果中找不到，请检查 CSV 中的 ID 列格式是否正确 (应为 rno+数字)。")
+}
+
+
+
+
+
+
+                                
 ###################### ------------------- 循环 ------------------- ######################
 # # 开始循环处理每个细胞类型
 # 开始循环处理每个细胞类型
