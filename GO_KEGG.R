@@ -78,9 +78,15 @@ if (nrow(GO) != 0) {
   print(p2)
   
   ## Tree
-  GO_ed <- pairwise_termsim(GO)
-  p3 <- treeplot(GO_ed)
-  print(p3)
+  # 注意：treeplot在某些版本中可能存在兼容性问题，使用tryCatch捕获错误
+  tryCatch({
+    GO_ed <- pairwise_termsim(GO)
+    p3 <- treeplot(GO_ed)
+    print(p3)
+  }, error = function(e) {
+    cat("警告：treeplot绘图失败，已跳过。错误信息：", e$message, "\n")
+    cat("提示：这可能是包版本兼容性问题，dotplot和barplot已成功生成。\n")
+  })
   dev.off()
   
 }
@@ -202,6 +208,11 @@ ggsave("selected_GO_filtered_END.pdf", plot = p, width = 5, height = 5.5)
 
 # ----------------------------------- KEGG ----------------------------------
 
+options(timeout = 300)
+options(download.file.method = "libcurl")
+options(url.method = "libcurl")
+
+
 # 筛选上调表达的基因
 top_up <- marker %>% filter(cluster == name) %>% 
           filter(avg_log2FC > 0.3 & p_val_adj < 0.05) %>% arrange(desc(avg_log2FC), p_val_adj) 
@@ -236,10 +247,15 @@ if (nrow(KEGG_up) != 0) {
   print(p1)
   p2 <- dotplot(KEGG_up, x = "GeneRatio", color = colorSel, showCategory = 10, title = "Top 10 of Pathway Enrichment",  label_format = 70) # 超过40个字符串换行
   print(p2)
-  ## Tree
-  KEGG_up_ed <- pairwise_termsim(KEGG_up)
-  p3 <- treeplot(KEGG_up_ed)
-  print(p3)
+  # 注意：treeplot在某些版本中可能存在兼容性问题，使用tryCatch捕获错误
+  tryCatch({
+    KEGG_up_ed <- pairwise_termsim(KEGG_up)
+    p3 <- treeplot(KEGG_up_ed)
+    print(p3)
+  }, error = function(e) {
+    cat("警告：KEGG_up treeplot绘图失败，已跳过。错误信息：", e$message, "\n")
+    cat("提示：这可能是包版本兼容性问题，dotplot和barplot已成功生成。\n")
+  })
   
   dev.off()
   
@@ -255,10 +271,16 @@ if (nrow(KEGG_down) != 0 ) {
   print(p1)
   p2 <- dotplot(KEGG_down, x = "GeneRatio", color = colorSel, showCategory = 10, title = "Top 10 of Pathway Enrichment",  label_format = 70) # 超过40个字符串换行
   print(p2)
-  ## Tree
-  KEGG_down_ed <- pairwise_termsim(KEGG_down)
-  p3 <- treeplot(KEGG_down_ed)
-  print(p3)
+  
+    # 注意：treeplot在某些版本中可能存在兼容性问题，使用tryCatch捕获错误
+    tryCatch({
+      KEGG_up_ed <- pairwise_termsim(KEGG_down)
+      p3 <- treeplot(KEGG_down_ed)
+      print(p3)
+    }, error = function(e) {
+      cat("警告：KEGG_down treeplot 绘图失败，已跳过。错误信息：", e$message, "\n")
+      cat("提示：这可能是包版本兼容性问题，dotplot和barplot已成功生成。\n")
+    })
   
   dev.off()
   
