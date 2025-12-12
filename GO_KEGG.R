@@ -65,16 +65,16 @@ if (nrow(GO) < 10) {
 if (nrow(GO) != 0) {
   # 生成气泡图
   pdf(file = paste0(name, "_GO.pdf"), width = 12, height = 15)
-  p1 <- dotplot(GO,x = "GeneRatio", color = colorSel, size = "Count", showCategory = showNum,label_format=150,split="ONTOLOGY") + # 以 ONTOLOGY 类型分开  
-    facet_grid(ONTOLOGY~., scales = 'free') # 以 ONTOLOGY 类型分屏绘图
+  p1 <- dotplot(GO,x = "GeneRatio", color = colorSel, size = "Count", showCategory = showNum,label_format=150,split="ONTOLOGY") # 以 ONTOLOGY 类型分开  
+    
   print(p1)
   #dev.off()
   
   
   # 生成条形图
   #pdf(file = "GO_bar.pdf", width = 10, height = 8)
-  p2 <- barplot(GO, x = "Count", color = colorSel, showCategory = showNum, label_format=150,split="ONTOLOGY") + 
-    facet_grid(ONTOLOGY~., scales = 'free') # 以 ONTOLOGY 类型分开绘图
+  p2 <- barplot(GO, x = "Count", color = colorSel, showCategory = showNum, label_format=150,split="ONTOLOGY")
+    
   print(p2)
   
   ## Tree
@@ -141,8 +141,7 @@ if (nrow(GO_filtered@result) > 0) {
                 showCategory = nrow(GO_filtered@result), 
                 title = "Manual Filtered GO Enrichment",
                 label_format = 60,
-                split = "ONTOLOGY") + 
-        facet_grid(ONTOLOGY~., scales = 'free')
+                split = "ONTOLOGY")
   print(p1)
   
   # --- 条形图 ---
@@ -151,8 +150,7 @@ if (nrow(GO_filtered@result) > 0) {
                 showCategory = nrow(GO_filtered@result), 
                 title = "Manual Filtered GO Enrichment",
                 label_format = 60,
-                split = "ONTOLOGY") + 
-        facet_grid(ONTOLOGY~., scales = 'free')
+                split = "ONTOLOGY")
   print(p2)
   
   dev.off()
