@@ -77,16 +77,16 @@ if (nrow(GO) != 0) {
     
   print(p2)
   
-  ## Tree
-  # 注意：treeplot在某些版本中可能存在兼容性问题，使用tryCatch捕获错误
-  tryCatch({
-    GO_ed <- pairwise_termsim(GO)
-    p3 <- treeplot(GO_ed)
-    print(p3)
-  }, error = function(e) {
-    cat("警告：treeplot绘图失败，已跳过。错误信息：", e$message, "\n")
-    cat("提示：这可能是包版本兼容性问题，dotplot和barplot已成功生成。\n")
-  })
+  # ## Tree
+  # # 注意：treeplot在某些版本中可能存在兼容性问题，使用tryCatch捕获错误
+  # tryCatch({
+  #   GO_ed <- pairwise_termsim(GO)
+  #   p3 <- treeplot(GO_ed)
+  #   print(p3)
+  # }, error = function(e) {
+  #   cat("警告：treeplot绘图失败，已跳过。错误信息：", e$message, "\n")
+  #   cat("提示：这可能是包版本兼容性问题，dotplot和barplot已成功生成。\n")
+  # })
   dev.off()
   
 }
