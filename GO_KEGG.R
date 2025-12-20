@@ -361,7 +361,7 @@ if (nrow(KEGG_down) != 0 ) {
 df = as.data.frame(KEGG_up)
 df$geneID = as.character(sapply(df$geneID, function(x) paste(gene_ID$SYMBOL[match(strsplit(x, "/")[[1]], as.character(gene_ID$ENTREZID))], collapse = "/"))) # 将geneID转换为基因符号
 df_ed = df[(df$pvalue < pvalueFilter & df$qvalue < qvalueFilter),] 
-write.csv(df_ed, file = paste0(name,"_KEGG_down.csv"), row.names = FALSE)
+write.csv(df_ed, file = paste0(name,"_KEGG_up.csv"), row.names = FALSE)
 
 
 df = as.data.frame(KEGG_down)
