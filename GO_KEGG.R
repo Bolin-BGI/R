@@ -66,6 +66,7 @@ if (nrow(GO) != 0) {
   # 生成气泡图
   pdf(file = paste0(name, "_GO.pdf"), width = 12, height = 15)
   p1 <- dotplot(GO,x = "GeneRatio", color = colorSel, size = "Count", showCategory = showNum,label_format=150,split="ONTOLOGY") # 以 ONTOLOGY 类型分开  
+                # + facet_grid(ONTOLOGY~., scales = 'free')
     
   print(p1)
   #dev.off()
@@ -74,7 +75,7 @@ if (nrow(GO) != 0) {
   # 生成条形图
   #pdf(file = "GO_bar.pdf", width = 10, height = 8)
   p2 <- barplot(GO, x = "Count", color = colorSel, showCategory = showNum, label_format=150,split="ONTOLOGY")
-    
+                # + facet_grid(ONTOLOGY~., scales = 'free')
   print(p2)
   
   # ## Tree
