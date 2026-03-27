@@ -92,6 +92,57 @@ stacked_barplot(
   <img src="https://github.com/user-attachments/assets/40e327b5-3cc5-4a7c-b291-d8b1d7ce8d84" width="500" />
 </p>
 
+
+
+
+
+---
+
+
+## Seurat 按组分面气泡图 (Grouped DotPlot)
+
+绘制清晰、分面的单细胞RNA-seq气泡图（DotPlot）的R函数。与Seurat默认绘制的一长串连续基因不同，该函数允许您**按生物学功能、通路或特征基因集对基因进行分组**，使最终的可视化结果结构更清晰，更易于解读。
+
+## 依赖包
+* `Seurat`
+* `ggplot2`
+
+#####  使用说明与示例
+
+请先在您的 R 环境中加载该函数，然后将您感兴趣的基因整理为一个**命名列表 (Named List)**。列表的名称将作为图表顶部的分面标题。
+
+```R
+# 1. 加载函数 (假设文件名为 GroupedDotPlot.R)
+source("GroupedDotPlot.R")
+
+# 2. 定义您的基因分组（使用命名列表）
+# 列表的名称 (如 "VM_structural_genes") 会自动成为分面标题
+my_gene_signatures <- list(
+  "VM_structural_genes" = c("CDH5", "KDR", "PECAM1", "CLDN5", "TEK", "CD34"),
+  "VM_regulatory_genes" = c("PDGFB", "ANGPT2", "VEGFA", "MMP9", "FN1", "COL1A1", "LOX"),
+  "Immunosuppressive_genes" = c("IL10", "TGFB1", "ARG1", "CD163", "MRC1", "CD274")
+)
+
+# 3. 生成并绘制图表
+# 注意：'seurat_object' 需要替换为您自己环境中的 Seurat 对象名称
+p <- GroupedDotPlot(
+  obj = seurat_object,
+  gene_groups = my_gene_signatures,
+  group.by = "celltype_myeloid",             # 映射到Y轴的细胞类型元数据列
+  colors = c("lightgrey", "#ffc7c7", "red"), # 自定义低中高表达量的颜色
+  save_prefix = "Dotplot_VM_genes_myeloid",  # 自动将结果保存为同名的 .png 和 .pdf 文件
+  width = 9,
+  height = 8
+)
+
+# 4. 在控制台/画板中显示图片
+print(p)
+
+<p align="center">
+  <img width="2700" height="2100" alt="Dotplot_VM_genes_myeloid" src="https://github.com/user-attachments/assets/b604802d-2276-41de-990e-ad42e75ef541" />
+</p>
+
+
 ---
 
 ## 📈 cluster_proportion_trend
