@@ -138,6 +138,7 @@ p <- GroupedDotPlot(
 # 4. 在控制台/画板中显示图片
 print(p)
 
+```
 <p align="center">
   <img width="2700" height="2100" alt="Dotplot_VM_genes_myeloid" src="https://github.com/user-attachments/assets/b604802d-2276-41de-990e-ad42e75ef541" />
 </p>
